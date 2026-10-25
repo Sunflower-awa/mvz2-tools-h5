@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MVZ2 关卡文件转换器</title>
+<link rel="stylesheet" href="css/lvl-converter.css">
+<script src="js/extjson.js"></script>
+</head>
+<body>
+  <header>
+    <h1>MVZ2 关卡文件转换器</h1>
+    <span class="sub">.lvl / .dat / .gz ⇄ .json</span>
+  </header>
+
+  <div class="bar">
+    <button id="btnOpen" type="button">打开文件</button>
+    <button id="btnSave" type="button" disabled>保存文件</button>
+    <button id="btnFields" type="button" aria-expanded="false" aria-controls="fields">字段 ▾</button>
+    <label class="field">格式
+      <select id="fmt">
+        <option value="lvl">.lvl（gzip）</option>
+        <option value="dat">.dat（gzip）</option>
+        <option value="gz">.gz（gzip）</option>
+        <option value="json" selected>.json（纯文本）</option>
+      </select>
+    </label>
+    <label class="field">文件名
+      <input id="fileName" type="text" spellcheck="false" autocomplete="off" placeholder="level">
+    </label>
+    <input id="picker" type="file" accept=".lvl,.dat,.gz,.json,application/gzip,application/json" hidden>
+  </div>
+
+  <input id="filePath" type="text" readonly spellcheck="false"
+         placeholder="当前文件路径（尚未打开文件）">
+
+  <div id="status">打开一个 .lvl / .dat / .gz / .json 文件开始。</div>
+
+  <section id="fields" hidden>
+    <div class="fields-head">
+      <input id="q" type="search" placeholder="搜索路径（模糊，rngx 可匹配 1.rng.x）" spellcheck="false" autocomplete="off">
+      <select id="typeFilter">
+        <option value="all">全部类型</option>
+        <option value="string">字符串</option>
+        <option value="number">数字</option>
+        <option value="numberlong">NumberLong</option>
+        <option value="boolean">布尔</option>
+        <option value="null">null</option>
+        <option value="array">数组</option>
+        <option value="object">对象</option>
+      </select>
+      <span id="count"></span>
+    </div>
+
+    <div id="list" role="listbox" aria-label="字段列表"></div>
+
+    <div id="editBox">
+      <div id="selPath" class="empty">未选择字段</div>
+      <div class="value-row">
+        <input id="newValue" type="text" spellcheck="false" autocomplete="off"
+               placeholder='新值（JSON 文本：42 / "abc" / NumberLong(7)）'>
+        <button id="btnApply" type="button" disabled>应用</button>
+        <button id="btnDelete" type="button" disabled title="从数组/对象里移除该字段">删除</button>
+      </div>
+      <div id="fieldMsg"></div>
+    </div>
+  </section>
+
+  <div id="editorWrap">
+    <textarea id="editor" spellcheck="false" wrap="off"
+      placeholder="内容会显示在这里。也可以把文件直接拖进窗口。"></textarea>
+  </div>
+
+  <div id="drop">松开以打开文件</div>
+
+<script src="js/lvl-converter.js"></script>
+</body>
+</html>
