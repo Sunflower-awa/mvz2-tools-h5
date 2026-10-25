@@ -8,16 +8,18 @@
 <script src="js/extjson.js"></script>
 </head>
 <body>
-  <header>
-    <h1>MVZ2 关卡文件转换器</h1>
-    <span class="sub">.lvl / .dat / .gz ⇄ .json</span>
-  </header>
 
-  <div class="bar">
+<!-- ================= 标题栏 / 全局工具条 ================= -->
+<div id="titleBar">
+  <div class="tb-left">
+    <span class="logo">MVZ2</span>
+    <h1>关卡文件转换器</h1>
+    <span class="sub">.lvl / .dat / .gz ⇄ .json</span>
+  </div>
+  <div class="tb-right">
     <button id="btnOpen" type="button">打开文件</button>
     <button id="btnSave" type="button" disabled>保存文件</button>
-    <button id="btnFields" type="button" aria-expanded="false" aria-controls="fields">字段 ▾</button>
-    <label class="field">格式
+    <label class="field"><span class="lbl">格式</span>
       <select id="fmt">
         <option value="lvl">.lvl（gzip）</option>
         <option value="dat">.dat（gzip）</option>
@@ -25,54 +27,139 @@
         <option value="json" selected>.json（纯文本）</option>
       </select>
     </label>
-    <label class="field">文件名
+    <label class="field"><span class="lbl">文件名</span>
       <input id="fileName" type="text" spellcheck="false" autocomplete="off" placeholder="level">
     </label>
-    <input id="picker" type="file" accept=".lvl,.dat,.gz,.json,application/gzip,application/json" hidden>
   </div>
+</div>
+<input id="picker" type="file" accept=".lvl,.dat,.gz,.json,application/gzip,application/json" hidden>
 
-  <input id="filePath" type="text" readonly spellcheck="false"
-         placeholder="当前文件路径（尚未打开文件）">
+<!-- ================= 工作台 ================= -->
+<div id="workbench">
 
-  <div id="status">打开一个 .lvl / .dat / .gz / .json 文件开始。</div>
+  <!-- 活动栏 -->
+  <nav id="activityBar" aria-label="面板">
+    <button class="act" type="button" data-act="fields" title="字段（Ctrl+Shift+E）">⌗<span>字段</span></button>
+    <button class="act" type="button" data-act="props" title="属性表（Ctrl+Shift+P）">▦<span>属性</span></button>
+    <div class="act-gap"></div>
+    <button class="act" type="button" data-act-toggle="sidebar" title="显示/隐藏侧边栏（Ctrl+B）">◧</button>
+    <button class="act" type="button" data-act-toggle="bottom" title="显示/隐藏输出（Ctrl+J）">≡</button>
+    <button id="btnLayoutReset" class="act" type="button" title="重置布局">⟲</button>
+  </nav>
 
-  <section id="fields" hidden>
-    <div class="fields-head">
-      <input id="q" type="search" placeholder="搜索路径（模糊，rngx 可匹配 1.rng.x）" spellcheck="false" autocomplete="off">
-      <select id="typeFilter">
-        <option value="all">全部类型</option>
-        <option value="string">字符串</option>
-        <option value="number">数字</option>
-        <option value="numberlong">NumberLong</option>
-        <option value="boolean">布尔</option>
-        <option value="null">null</option>
-        <option value="array">数组</option>
-        <option value="object">对象</option>
-      </select>
-      <span id="count"></span>
+  <!-- 侧边栏：一栏一个面板，用标签切换 -->
+  <aside id="sidebar">
+    <div class="side-tabs" id="sideTabs"></div>
+    <div class="panel-host" id="sideHost"></div>
+  </aside>
+
+  <div class="splitter" id="spSide" role="separator" aria-orientation="vertical"
+       title="拖动调整侧边栏宽度（双击复位）"></div>
+
+  <!-- 主区域 -->
+  <main id="mainArea">
+    <div id="editorArea">
+
+      <!-- 编辑器组 1：文本区（固定主内容） -->
+      <section class="egroup" id="egroup1">
+        <div class="g-tabs">
+          <div class="g-tab active">编辑器</div>
+          <div class="g-spacer"></div>
+          <button id="btnSplit" class="g-act" type="button" title="拆分 / 收起右侧编辑器组">
+            <span class="split-ico">◫</span>
+          </button>
+        </div>
+        <div class="crumb"><span id="filePath" class="empty">尚未打开文件</span></div>
+        <div class="g-body">
+          <textarea id="editor" spellcheck="false" wrap="off"
+            placeholder="内容会显示在这里。也可以把文件直接拖进窗口。"></textarea>
+        </div>
+      </section>
+
+      <div class="splitter" id="spGroup" role="separator" aria-orientation="vertical"
+           title="拖动调整编辑器组宽度（双击复位）" hidden></div>
+
+      <!-- 编辑器组 2：停靠面板（默认放属性表） -->
+      <section class="egroup" id="egroup2" hidden>
+        <div class="g-tabs" id="tabsGroup2"></div>
+        <div class="panel-host" id="group2Host"></div>
+      </section>
+
     </div>
 
-    <div id="list" role="listbox" aria-label="字段列表"></div>
+    <div class="splitter h" id="spBottom" role="separator" aria-orientation="horizontal"
+         title="拖动调整输出面板高度（双击复位）" hidden></div>
 
-    <div id="editBox">
-      <div id="selPath" class="empty">未选择字段</div>
-      <div class="value-row">
-        <input id="newValue" type="text" spellcheck="false" autocomplete="off"
-               placeholder='新值（JSON 文本：42 / "abc" / NumberLong(7)）'>
-        <button id="btnApply" type="button" disabled>应用</button>
-        <button id="btnDelete" type="button" disabled title="从数组/对象里移除该字段">删除</button>
+    <section id="bottomPanel" hidden>
+      <div class="bp-head">
+        <span>输出</span>
+        <div class="g-spacer"></div>
+        <button id="btnClearLog" class="g-act" type="button" title="清空">清空</button>
+        <button id="btnCloseBottom" class="g-act" type="button" title="关闭">×</button>
       </div>
-      <div id="fieldMsg"></div>
-    </div>
-  </section>
+      <div id="logList" class="log-list"></div>
+    </section>
+  </main>
+</div>
 
-  <div id="editorWrap">
-    <textarea id="editor" spellcheck="false" wrap="off"
-      placeholder="内容会显示在这里。也可以把文件直接拖进窗口。"></textarea>
+<!-- ================= 状态栏 ================= -->
+<div id="statusBar">
+  <div id="status"></div>
+  <div class="sb-right">
+    <span id="sbPos"></span>
+    <button id="btnOutput" class="sb-btn" type="button" title="显示/隐藏输出面板">输出</button>
   </div>
+</div>
 
-  <div id="drop">松开以打开文件</div>
+<!-- ================= 面板（由 js/lvl-shell.js 停靠到侧边栏或编辑器组） ================= -->
 
+<section id="fields" class="panel" data-panel="fields" data-title="字段" hidden>
+  <div class="panel-head">
+    <input id="q" type="search" placeholder="搜索路径（模糊，rngx 可匹配 1.rng.x）"
+           spellcheck="false" autocomplete="off">
+    <select id="typeFilter" title="按类型过滤">
+      <option value="all">全部类型</option>
+      <option value="string">字符串</option>
+      <option value="number">数字</option>
+      <option value="numberlong">NumberLong</option>
+      <option value="boolean">布尔</option>
+      <option value="null">null</option>
+      <option value="array">数组</option>
+      <option value="object">对象</option>
+    </select>
+    <span id="count"></span>
+    <button class="dock-btn" type="button" data-dock="fields" title="停靠到侧边栏 / 编辑器组">⧉</button>
+  </div>
+  <div id="list" role="listbox" aria-label="字段列表"></div>
+  <div id="editBox">
+    <div id="selPath" class="empty">未选择字段</div>
+    <div class="value-row">
+      <input id="newValue" type="text" spellcheck="false" autocomplete="off"
+             placeholder='新值（JSON 文本：42 / "abc" / NumberLong(7)）'>
+      <button id="btnApply" type="button" disabled>应用</button>
+      <button id="btnDelete" type="button" disabled title="从数组/对象里移除该字段">删除</button>
+    </div>
+    <div id="fieldMsg"></div>
+  </div>
+</section>
+
+<section id="props" class="panel" data-panel="props" data-title="属性表" hidden>
+  <div class="panel-head">
+    <input id="propSearch" type="search" placeholder="筛选名称 / 键 / 路径"
+           spellcheck="false" autocomplete="off">
+    <button id="btnFavOnly" type="button">只看收藏</button>
+    <span id="propCount"></span>
+    <button class="dock-btn" type="button" data-dock="props" title="停靠到侧边栏 / 编辑器组">⧉</button>
+  </div>
+  <div id="favBar" class="fav-bar" hidden></div>
+  <div id="propTable" class="prop-table"></div>
+</section>
+
+<div id="drop">松开以打开文件</div>
+
+<script src="js/lvl-shell.js"></script>
 <script src="js/lvl-converter.js"></script>
+<script src="js/lvl-props-v3.data.js"></script>
+<script src="js/lvl-props.js"></script>
 </body>
 </html>

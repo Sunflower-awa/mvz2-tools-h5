@@ -19,10 +19,10 @@
   var SEARCH_CAP = 300;              // 搜索状态下少渲染一些，保证输入跟手
 
   var $ = function (id) { return document.getElementById(id); };
-  var btnOpen = $('btnOpen'), btnSave = $('btnSave'), btnFields = $('btnFields');
+  var btnOpen = $('btnOpen'), btnSave = $('btnSave');
   var fmtSel = $('fmt'), nameInput = $('fileName'), pathInput = $('filePath');
-  var statusEl = $('status'), editor = $('editor'), picker = $('picker');
-  var fieldsBox = $('fields'), listEl = $('list'), countEl = $('count');
+  var statusEl = $('status'), editor = $('editor'), picker = $('picker'), sbPos = $('sbPos');
+  var listEl = $('list'), countEl = $('count');
   var qInput = $('q'), typeFilter = $('typeFilter');
   var selPathEl = $('selPath'), newValue = $('newValue'), btnApply = $('btnApply');
   var btnDelete = $('btnDelete'), fieldMsgEl = $('fieldMsg');
@@ -38,15 +38,26 @@
   function setStatus(text, kind) {
     statusEl.textContent = text;
     statusEl.className = kind || '';
+    statusEl.title = text;
+    if (window.LvlShell && window.LvlShell.log) window.LvlShell.log(text, kind);
   }
   function setFieldMsg(text, kind) {
     fieldMsgEl.textContent = text || '';
     fieldMsgEl.className = kind || '';
   }
   function setPath(text) {
-    pathInput.value = text;
+    pathInput.textContent = text || '尚未打开文件';
     pathInput.classList.toggle('hasFile', !!(text && text.length));
-    pathInput.title = text;
+    pathInput.classList.toggle('empty', !text);
+    pathInput.title = text || '';
+  }
+  function updatePos() {
+    if (!sbPos) return;
+    var pos = editor.selectionStart || 0;
+    var upto = editor.value.slice(0, pos);
+    var line = upto.split('\n').length;
+    var col = upto.length - (upto.lastIndexOf('\n') + 1) + 1;
+    sbPos.textContent = '行 ' + line + '，列 ' + col;
   }
   function fmtBytes(n) {
     if (n < 1024) return n + ' 字节';
@@ -126,8 +137,11 @@
       editor.scrollTop = 0;
 
       reindex();
-      // 宽屏自动展开字段面板，手机上保持收起（省地方）
-      setFieldsOpen(fieldsBox.hidden ? window.innerWidth >= 760 : true);
+      renderList();
+      // 属性表在右侧时，顺手把侧边栏的字段列表露出来（两边各司其职）
+      if (window.LvlShell && window.LvlShell.state().split) window.LvlShell.reveal('fields');
+      propRefresh();
+      updatePos();
     } catch (e) {
       setStatus('打开失败：' + (e && e.message ? e.message : e), 'err');
     }
@@ -217,11 +231,17 @@
   }
 
   // ---------------- 字段面板 ----------------
-  function setFieldsOpen(open) {
-    fieldsBox.hidden = !open;
-    btnFields.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btnFields.textContent = open ? '字段 ▴' : '字段 ▾';
-    if (open) {
+  function propRefresh() {
+    if (window.LvlProps && typeof window.LvlProps.renderAll === 'function') {
+      window.LvlProps.renderAll();
+    }
+  }
+
+  // 面板被切到前台时刷新（外壳负责切换，这里只知道“谁被激活了”）
+  function onPanelActivate(id) {
+    if (id === 'props') {
+      propRefresh();
+    } else if (id === 'fields') {
       reindex();
       renderList();
     }
@@ -439,6 +459,7 @@
       renderList();
       if (ext && ext.has(keep)) selectPath(keep, true);
       else { selectedPath = null; updateEditBox(); }
+      propRefresh();
     } catch (e) {
       setFieldMsg('修改失败：' + (e && e.message ? e.message : e), 'err');
     }
@@ -455,6 +476,7 @@
       setFieldMsg('已删除 1 个字段', 'ok');
       reindex();
       renderList();
+      propRefresh();
     } catch (e) {
       setFieldMsg('删除失败：' + (e && e.message ? e.message : e), 'err');
     }
@@ -470,11 +492,6 @@
   });
 
   btnSave.addEventListener('click', saveFile);
-
-  btnFields.addEventListener('click', function () {
-    if (fieldsBox.hidden) { reindex(); setFieldsOpen(true); }
-    else { setFieldsOpen(false); }
-  });
 
   fmtSel.addEventListener('change', function () {
     nameInput.value = withExt(nameInput.value, fmtSel.value);
@@ -502,12 +519,17 @@
 
   // 停止输入3秒后刷新路径
   editor.addEventListener('input', function () {
+    updatePos();
     clearTimeout(inputTimer);
     inputTimer = setTimeout(function () {
-      if (fieldsBox.hidden) return;
+      if (window.LvlShell && !window.LvlShell.anyPanelVisible()) return;
       reindex();
       renderList();
+      propRefresh();
     }, 3000);
+  });
+  ['keyup', 'click', 'select', 'focus'].forEach(function (ev) {
+    editor.addEventListener(ev, updatePos);
   });
 
   document.addEventListener('keydown', function (e) {
@@ -537,5 +559,23 @@
     if (f) openFile(f);
   });
 
+  // 给属性表（js/lvl-props.js）提供的最小桥接
+  window.LvlApp = {
+    getEditor: function () { return editor.value; },
+    setEditor: function (text) { editor.value = text; updatePos(); },
+    getExt: function () { return ext; },
+    reindex: reindex,
+    renderList: renderList,
+    refreshAll: function () { reindex(); renderList(); },
+    setStatus: setStatus,
+    scrollTo: function (path) { scrollEditorTo(path); }
+  };
+
+  // 外壳切面板时回调本模块刷新
+  if (window.LvlShell && window.LvlShell.onActivate) {
+    window.LvlShell.onActivate(onPanelActivate);
+  }
+
   setPath('');
+  updatePos();
 })();
