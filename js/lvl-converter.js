@@ -431,16 +431,41 @@
     btnDelete.disabled = !ok;
   }
 
+  var _measureCtx = null;
+  function measureCtx() {
+    if (_measureCtx === null) {
+      try {
+        var cv = document.createElement('canvas');
+        _measureCtx = (cv.getContext && cv.getContext('2d')) || null;
+      } catch (e) { _measureCtx = null; }
+    }
+    return _measureCtx;
+  }
+
   function scrollEditorTo(path) {
     if (!ext) return;
     try {
       var span = ext.spanOf(path);
       var before = editor.value.slice(0, span.start);
+      var nl = before.lastIndexOf('\n');
       var line = before.split('\n').length - 1;
+      var lineText = nl < 0 ? before : before.slice(nl + 1);
+
+      // 纵向：行号 × 行高
       var lh = parseFloat(getComputedStyle(editor).lineHeight) || 20;
       editor.scrollTop = Math.max(0, line * lh - editor.clientHeight / 3);
-      var col = before.length - (before.lastIndexOf('\n') + 1);
-      editor.scrollLeft = Math.max(0, col * 7);
+
+      // 横向：用真实字形宽度量「目标前这段文本」的像素，不再用“列号×7px”估算。
+      // V3 的第二篇文档是一整行十几万列，7px/字的误差会累积到上万像素。
+      var ctx = measureCtx();
+      if (ctx) {
+        ctx.font = getComputedStyle(editor).font;
+        var w = ctx.measureText(lineText).width;
+        editor.scrollLeft = Math.max(0, w - editor.clientWidth * 0.3);
+      }
+
+      // 顺带高亮目标值（不抢焦点，避免打乱当前输入）
+      try { editor.setSelectionRange(span.start, span.end); } catch (e2) { /* 忽略 */ }
     } catch (e) { /* 忽略 */ }
   }
 

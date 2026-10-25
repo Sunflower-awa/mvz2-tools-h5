@@ -134,6 +134,7 @@ class El {
   releasePointerCapture() {}
   focus() {}
   blur() {}
+  setSelectionRange(a, b) { this.selectionStart = a; this.selectionEnd = b; }
   click() { fire(this, 'click', {}); }
 }
 
@@ -141,7 +142,12 @@ const ID_MAP = Object.create(null);
 
 class Doc extends El {
   constructor() { super('#document'); this.readyState = 'complete'; this._body = null; }
-  createElement(tag) { return new El(tag); }
+  createElement(tag) {
+    if (tag === 'canvas') {                 // 供 scrollEditorTo 测量文本宽度
+      return { getContext: () => ({ font: '', measureText: (s) => ({ width: s.length * 7.8 }) }) };
+    }
+    return new El(tag);
+  }
   createTextNode(t) { const e = new El('#text'); e._text = String(t); return e; }
   createDocumentFragment() { return new El('#fragment'); }
   get body() { return this._body; }
@@ -292,7 +298,7 @@ Object.assign(globalThis, {
   devicePixelRatio: 1,
   addEventListener(t, fn) { (winLis[t] || (winLis[t] = [])).push(fn); },
   removeEventListener() {},
-  getComputedStyle: () => ({ lineHeight: '20px' }),
+  getComputedStyle: () => ({ lineHeight: '20px', font: '13px monospace' }),
   localStorage: {
     getItem: (k) => (store.has(k) ? store.get(k) : null),
     setItem: (k, v) => store.set(k, String(v)),
@@ -428,6 +434,31 @@ eq('NumberLong 类型徽章', nlRow.children[3].textContent, 'NumberLong');
 nlCtrl.value = '9999';
 fire(nlCtrl, 'change', {});
 eq('NumberLong 写回', App.getExt().get(nlDef.path), 'NumberLong(9999)');
+
+// ---- 3.5 定位（回归：单行 JSON 深层字段不能靠“列号×7px”估算，会滚飞）----
+const diffDef = data.find((d) => d.id === 'difficulty');
+const diffRow = propRows().find((r) => r.children[1] && r.children[1].textContent === diffDef.name);
+const locBtn = diffRow && diffRow.children[4];
+ok('难度行有定位按钮', !!locBtn);
+if (locBtn) {
+  const sp = App.getExt().spanOf(diffDef.path);
+  fire(locBtn, 'click', {});
+  eq('定位选中难度值起点', $('editor').selectionStart, sp.start);
+  eq('定位选中难度值终点', $('editor').selectionEnd, sp.end);
+  const before = $('editor').value.slice(0, sp.start);
+  const nl = before.lastIndexOf('\n');
+  const lineText = nl < 0 ? before : before.slice(nl + 1);
+  eq('定位 难度横向滚动(按真实宽度)', $('editor').scrollLeft, lineText.length * 7.8);
+}
+
+// 对照：音乐在行首，横向滚动应当很小
+const musicDef = data.find((d) => d.id === 'musicID');
+const musicRow = propRows().find((r) => r.children[1] && r.children[1].textContent === musicDef.name);
+if (musicRow) {
+  const msp = App.getExt().spanOf(musicDef.path);
+  fire(musicRow.children[4], 'click', {});
+  ok('定位 音乐横向滚动较小', $('editor').scrollLeft < 5000, $('editor').scrollLeft);
+}
 
 // ---- 4. 布尔 ----
 const boolDef = data.find((d) => d.type === 'bool');
