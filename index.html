@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>参数面板</title>
+<style>
+  html, body {
+    margin: 0; min-height: 100%; background: #15171a; color: #ddd;
+    font: 14px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  #panel { width: 100%; max-width: 560px; margin: 10px auto; padding: 0 8px; box-sizing: border-box; }
+  #panel > * { width: 100%; }           /* 类名无关，稳 */
+  #out { margin: 12px; font: 12px/1.5 ui-monospace, Consolas, monospace; opacity: .65; white-space: pre-wrap; }
+</style>
+<script src="js/tweakpane.min.js"></script>
+</head>
+<body>
+  <div id="panel"></div>
+  <pre id="out"></pre>
+
+<script>
+const DEFAULTS = {
+  width: 960, height: 540,
+  bg: '#1a1a1a',
+  quality: 'high',
+  speed: 1,
+  loop: true,
+};
+
+// 读取上次保存的参数
+const params = Object.assign({}, DEFAULTS,
+  JSON.parse(localStorage.getItem('mvz2.params') || '{}'));
+
+const pane = new Tweakpane.Pane({ container: document.getElementById('panel'), title: '参数' });
+
+const fSize = pane.addFolder({ title: '尺寸', expanded: true });
+fSize.addInput(params, 'width',  { label: '宽', min: 320, max: 3840, step: 1 });
+fSize.addInput(params, 'height', { label: '高', min: 240, max: 2160, step: 1 });
+
+const fLook = pane.addFolder({ title: '外观', expanded: true });
+fLook.addInput(params, 'bg', { label: '背景色' });                 // 颜色字符串自动变取色器
+fLook.addInput(params, 'quality', { label: '质量',
+  options: { 低: 'low', 中: 'mid', 高: 'high' } });
+
+const fRun = pane.addFolder({ title: '运行' });
+fRun.addInput(params, 'speed', { label: '速度', min: 0.1, max: 4, step: 0.1 });
+fRun.addInput(params, 'loop',  { label: '循环' });
+
+pane.addButton({ title: '恢复默认' }).on('click', () => {
+  Object.assign(params, DEFAULTS); pane.refresh(); save();
+});
+pane.addButton({ title: '导出 JSON' }).on('click', () => {
+  console.log(JSON.stringify(params, null, 2));
+});
+
+pane.on('change', save);   // 任何控件变动都会触发
+
+function save() {
+  localStorage.setItem('mvz2.params', JSON.stringify(params));
+  document.getElementById('out').textContent = JSON.stringify(params, null, 2);
+}
+save();
+</script>
+</body>
+</html>
