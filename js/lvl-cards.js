@@ -165,7 +165,7 @@
     var frag = document.createDocumentFragment();
     zombies().forEach(function (z) {
       if (q && (z.id + ' ' + (z.zh || '') + ' ' + (z.en || '')).toLowerCase().indexOf(q) < 0) return;
-      var card = document.createElement('button');
+      var card = document.createElement('div');
       card.type = 'button';
       card.className = 'zcard';
       card.dataset.id = z.id;
