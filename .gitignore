@@ -1,4 +1,5 @@
 mvz2_file/关卡文件/castle_5_2.lvl
 mvz2_file/关卡文件/castle_5.json
 mvz2_file/关卡文件/castle_5.lvl
-resources_pck/private/mvz2/obj_csv/artifacts.csv
+resources_pck/
+mvz2-tools.zip

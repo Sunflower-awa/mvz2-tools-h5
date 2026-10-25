@@ -2,11 +2,12 @@
 /*!
  * csv-to-lvl-props.mjs — 把 data/level_props_v3.csv 编译成 js/lvl-props-v3.data.js
  *
- * CSV 列：group,id,name,type,path,default,readonly,desc,options
+ * CSV 列：group,id,name,type,path,default,readonly,desc,options,library
  *   path   用 ">" 分隔键段（不含文档序号，文档固定为 1 = SerializableLevelController）。
  *          例如 "level>properties>mvz2:level/starshardCount"。
- *   type   取 string|int|float|bool|numberlong|json。
+ *   type   取 string|int|float|bool|numberlong|json|cardpool。
  *   options 形如 "值=标签|值=标签"，用于下拉框。
+ *   library 可选：cardpool 类型指定卡片库（如 zombies）。
  *
  * 运行：node tools/csv-to-lvl-props.mjs
  */
@@ -84,6 +85,7 @@ const idx = (name) => {
 };
 const g = idx('group'), id = idx('id'), nm = idx('name'), ty = idx('type');
 const pa = idx('path'), de = idx('default'), ro = idx('readonly'), dc = idx('desc'), op = idx('options');
+const li = header.indexOf('library');   // 可选列
 
 const props = [];
 for (let r = 1; r < rows.length; r++) {
@@ -101,6 +103,7 @@ for (let r = 1; r < rows.length; r++) {
     readonly: row[ro].trim() === '1' || row[ro].trim() === 'true',
     desc: row[dc].trim(),
     options: parseOptions(row[op]),
+    library: li >= 0 ? (row[li] || '').trim() : '',
   });
 }
 

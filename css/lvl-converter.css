@@ -372,3 +372,95 @@ body.dragging #drop{display:grid}
     overflow:hidden; clip-path:inset(50%); white-space:nowrap;
   }
 }
+
+/* ---------- 卡片编辑器（出怪池等卡片式数组属性） ---------- */
+.prop-cardedit{
+  flex:0 1 96px; min-height:26px; padding:0 8px; font-size:12px;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel); color:var(--accent);
+}
+.prop-cardedit:hover:not(:disabled){border-color:var(--accent); background:rgba(76,141,255,.12)}
+.prop-badge.b-cardpool{color:#9ecbff; border-color:rgba(158,203,255,.4)}
+
+.cards-modal{
+  position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+  padding:16px; background:rgba(10,12,15,.66);
+}
+.cards-modal-card{
+  display:flex; flex-direction:column; width:min(960px,100%); max-height:min(88vh,760px);
+  border:1px solid var(--line); border-radius:10px; background:var(--panel); overflow:hidden;
+  box-shadow:0 12px 44px rgba(0,0,0,.5);
+}
+.cards-modal-head{
+  flex:none; display:flex; align-items:center; gap:10px; padding:10px 14px;
+  border-bottom:1px solid var(--line);
+}
+.cards-modal-title{
+  flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:13px; font-weight:600; font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+.cards-modal-close{
+  flex:none; width:28px; height:28px; min-height:28px; padding:0;
+  border:none; border-radius:6px; background:none; color:var(--dim); font-size:16px; line-height:1;
+}
+.cards-modal-close:hover{color:var(--fg); background:rgba(255,255,255,.08)}
+
+.cards-modal-body{
+  flex:1 1 auto; min-height:0; display:grid; grid-template-columns:minmax(0,3fr) minmax(0,2fr);
+  overflow:hidden;
+}
+.cards-lib,.cards-pool{display:flex; flex-direction:column; min-width:0; min-height:0}
+.cards-lib{border-right:1px solid var(--line)}
+.cards-subhead{
+  flex:none; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:7px 10px; border-bottom:1px solid rgba(255,255,255,.05);
+}
+.cards-subtitle{font-size:12px; color:var(--dim); white-space:nowrap}
+.cards-search{flex:1 1 130px; min-width:90px; min-height:28px; padding:0 8px}
+.cards-count{
+  min-width:22px; text-align:center; font-size:12px; color:var(--accent);
+  border:1px solid rgba(76,141,255,.4); border-radius:10px; padding:0 7px; white-space:nowrap;
+}
+.cards-mini{
+  flex:none; min-height:24px; padding:0 8px; font-size:11px;
+  border:1px solid var(--line); border-radius:4px; background:var(--panel2); color:var(--dim);
+}
+.cards-mini:hover:not(:disabled){color:var(--accent); border-color:var(--accent)}
+
+.cards-grid{
+  flex:1 1 auto; min-height:0; overflow:auto; padding:8px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr));
+  gap:8px; align-content:start; background:var(--bg);
+}
+.zcard{
+  display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0;
+  padding:8px 6px; border:1px solid var(--line); border-radius:8px;
+  background:var(--panel2); color:var(--fg); text-align:center;
+}
+.zcard:hover{border-color:var(--accent); background:rgba(76,141,255,.10)}
+.zcard-ico{
+  width:48px; height:48px; object-fit:contain; image-rendering:pixelated;
+  background:rgba(0,0,0,.25); border-radius:6px;
+}
+.zcard-name{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px}
+.zcard-id{max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; color:var(--dim)}
+
+.cards-pool-list{
+  flex:1 1 auto; min-height:0; overflow:auto; padding:6px;
+  display:flex; flex-direction:column; gap:4px; background:var(--bg);
+}
+.pitem{
+  display:flex; align-items:center; gap:8px; padding:5px 8px;
+  border:1px solid var(--line); border-radius:7px; background:var(--panel2); cursor:pointer;
+}
+.pitem:hover{border-color:var(--err)}
+.pitem .zcard-ico{width:30px; height:30px}
+.pitem-name{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px}
+.pitem-id{flex:0 1 auto; max-width:46%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:10px; color:var(--dim)}
+.pitem-del{flex:none; color:var(--dim); font-size:15px; line-height:1}
+.pitem:hover .pitem-del{color:var(--err)}
+.pitem-empty{padding:18px 8px; text-align:center; color:var(--dim); font-size:12px}
+
+@media (max-width:640px){
+  .cards-modal-body{grid-template-columns:1fr; grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+  .cards-lib{border-right:none; border-bottom:1px solid var(--line)}
+}

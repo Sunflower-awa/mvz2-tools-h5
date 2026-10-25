@@ -13,7 +13,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "关卡唯一标识，如 mvz2:castle_12",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -24,7 +25,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "区域定义 ID，如 mvz2:castle",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -52,7 +54,8 @@ window.LVL_PROPS_V3 = [
     "value": "mvz2:lunatic",
     "label": "疯狂"
    }
-  ]
+  ],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -63,7 +66,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "背景音乐 ID",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -74,7 +78,8 @@ window.LVL_PROPS_V3 = [
   "default": "false",
   "readonly": false,
   "desc": "是否已通关",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -85,7 +90,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "累计关卡时间（NumberLong）",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "基础信息",
@@ -96,7 +102,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "是否显示进度条",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "机械能",
@@ -107,7 +114,8 @@ window.LVL_PROPS_V3 = [
   "default": "9990",
   "readonly": false,
   "desc": "机械能上限",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "机械能",
@@ -118,7 +126,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "当前机械能",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "机械能",
@@ -129,7 +138,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "是否需要卡片",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "机械能",
@@ -140,7 +150,8 @@ window.LVL_PROPS_V3 = [
   "default": "10",
   "readonly": false,
   "desc": "卡片槽数量",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "机械能",
@@ -151,7 +162,8 @@ window.LVL_PROPS_V3 = [
   "default": "30",
   "readonly": false,
   "desc": "TPS（tick per second）",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "波次",
@@ -162,7 +174,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "当前波数",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "波次",
@@ -173,7 +186,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "当前旗帜数",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "波次",
@@ -217,7 +231,8 @@ window.LVL_PROPS_V3 = [
     "value": "100",
     "label": "首领战后"
    }
-  ]
+  ],
+  "library": ""
  },
  {
   "group": "波次",
@@ -228,7 +243,8 @@ window.LVL_PROPS_V3 = [
   "default": "false",
   "readonly": false,
   "desc": "是否为一大波",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "星之碎片",
@@ -239,7 +255,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "星之碎片数量",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "星之碎片",
@@ -250,7 +267,8 @@ window.LVL_PROPS_V3 = [
   "default": "5",
   "readonly": false,
   "desc": "星之碎片卡槽数量",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "星之碎片",
@@ -261,7 +279,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "启用星之碎片",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "全局开关",
@@ -272,7 +291,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "启用机械能",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "全局开关",
@@ -283,7 +303,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "启用蓝图",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "全局开关",
@@ -294,7 +315,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "启用铁镐",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "全局开关",
@@ -305,7 +327,8 @@ window.LVL_PROPS_V3 = [
   "default": "true",
   "readonly": false,
   "desc": "启用触发器",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "计数器",
@@ -316,7 +339,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "下一个实体 ID（NumberLong）",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "计数器",
@@ -327,7 +351,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "下一个 BUFF ID（NumberLong）",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "计数器",
@@ -338,7 +363,8 @@ window.LVL_PROPS_V3 = [
   "default": "0",
   "readonly": false,
   "desc": "下一个种子包 ID（NumberLong）",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "计数器",
@@ -349,7 +375,8 @@ window.LVL_PROPS_V3 = [
   "default": "10",
   "readonly": false,
   "desc": "传送带卡槽数量",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -360,7 +387,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "System.Single 包装对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -371,7 +399,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "System.Single 包装对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -382,7 +411,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "FrameTimer 对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -393,7 +423,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "FrameTimer 对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -404,7 +435,8 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "BuffReferenceLevel 对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
  },
  {
   "group": "高级属性",
@@ -415,6 +447,19 @@ window.LVL_PROPS_V3 = [
   "default": "",
   "readonly": false,
   "desc": "RandomGenerator 对象，原文编辑",
-  "options": []
+  "options": [],
+  "library": ""
+ },
+ {
+  "group": "出怪",
+  "id": "enemyPool",
+  "name": "出怪池",
+  "type": "cardpool",
+  "path": "1.level.properties[\"mvz2:level/enemyPool\"]",
+  "default": "",
+  "readonly": false,
+  "desc": "出怪池（僵尸 id 数组，点“编辑”用卡片添加/移除）",
+  "options": [],
+  "library": "zombies"
  }
 ];

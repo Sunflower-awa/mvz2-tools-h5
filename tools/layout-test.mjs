@@ -325,7 +325,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---------------------------------------------------------------- 跑脚本
 for (const f of ['js/extjson.js', 'js/lvl-shell.js', 'js/lvl-converter.js',
-                 'js/lvl-props-v3.data.js', 'js/lvl-props.js']) {
+                 'js/lvl-props-v3.data.js', 'js/lvl-zombies.data.js',
+                 'js/lvl-cards.js', 'js/lvl-props.js']) {
   vm.runInThisContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), { filename: f });
 }
 
@@ -416,9 +417,9 @@ eq('字段列表行数 > 0', queryAll($('list'), '.row').length > 0, true);
 
 const propRows = () => queryAll($('propTable'), '.prop-row');
 const propGroups = () => queryAll($('propTable'), '.prop-group');
-eq('属性表按类型渲染行数', propRows().length, 33);
-eq('属性表分组数', propGroups().length, 7);
-eq('属性计数文案', $('propCount').textContent, '33 / 33');
+eq('属性表按类型渲染行数', propRows().length, 34);
+eq('属性表分组数', propGroups().length, 8);
+eq('属性计数文案', $('propCount').textContent, '34 / 34');
 
 // ---- 3. NumberLong ----
 const data = window.LVL_PROPS_V3;
@@ -471,6 +472,55 @@ if (boolRow) {
   eq('布尔写回', App.getExt().get(boolDef.path), cb.checked ? 'true' : 'false');
 } else {
   ok('布尔行存在', false, '未找到');
+}
+
+// ---- 4.5 出怪池卡片编辑器 ----
+const poolDef = data.find((d) => d.type === 'cardpool' && d.id === 'enemyPool');
+ok('出怪池定义存在', !!poolDef);
+if (poolDef) {
+  const poolPath = poolDef.path;
+  const poolRow = propRows().find((r) => r.children[1] && r.children[1].textContent === poolDef.name);
+  ok('出怪池行存在', !!poolRow);
+  const editBtn = poolRow && poolRow.children[2];
+  ok('出怪池行有编辑按钮', !!(editBtn && editBtn.classList && editBtn.classList.contains('prop-cardedit')));
+
+  if (editBtn) {
+    ok('初始无 enemyPool 键', !App.getExt().has(poolPath));
+
+    const beforePool = App.getEditor();
+    fire(editBtn, 'click', {});
+    eq('卡片弹窗打开', queryAll(doc.body, '.cards-modal').length, 1);
+    eq('弹窗初始出怪池为空', queryAll(doc.body, '.pitem').length, 0);
+    ok('库里有僵尸卡', queryAll(doc.body, '.zcard').length > 0);
+
+    const zcard = (id) => queryAll(doc.body, '.zcard').find((c) => c.dataset.id === id);
+
+    const z1 = zcard('mvz2:zombie');
+    ok('找到 mvz2:zombie 卡', !!z1);
+    if (z1) {
+      fire(z1, 'click', {});
+      eq('添加后 enemyPool 键存在', App.getExt().has(poolPath), true);
+      eq('添加后 _v 数组', App.getExt().getValue(poolPath + '._v'), ['mvz2:zombie']);
+      eq('弹窗出怪池计数 1', queryAll(doc.body, '.pitem').length, 1);
+    }
+
+    const z2 = zcard('mvz2:skeleton');
+    if (z2) fire(z2, 'click', {});
+    eq('两只后 _v', App.getExt().getValue(poolPath + '._v'), ['mvz2:zombie', 'mvz2:skeleton']);
+
+    const item0 = queryAll(doc.body, '.pitem')[0];
+    if (item0) fire(item0, 'click', {});
+    eq('移除后 _v', App.getExt().getValue(poolPath + '._v'), ['mvz2:skeleton']);
+
+    const item1 = queryAll(doc.body, '.pitem')[0];
+    if (item1) fire(item1, 'click', {});
+    eq('清空后 enemyPool 键删除', App.getExt().has(poolPath), false);
+
+    const closeBtn = queryAll(doc.body, '.cards-modal-close')[0];
+    if (closeBtn) fire(closeBtn, 'click', {});
+    eq('弹窗已关闭', queryAll(doc.body, '.cards-modal').length, 0);
+    ok('出怪池编辑后文本字节级还原', App.getEditor() === beforePool);
+  }
 }
 
 // ---- 5. 收藏 ----

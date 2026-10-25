@@ -40,10 +40,15 @@
     return !!(ext && ext.has && ext.has('1.level'));
   }
 
-  // 读取当前值 → { found, text, checked }
+  // 读取当前值 → { found, text, checked }；cardpool 额外带 count
   function readValue(def) {
     var ext = getExt();
-    if (!ext || !ext.has(def.path)) return { found: false, text: '', checked: false };
+    if (!ext) return { found: false, text: '', checked: false };
+    if (def.type === 'cardpool') {
+      var pool = (window.LvlCards && window.LvlCards.readPool) ? window.LvlCards.readPool(ext, def.path) : [];
+      return { found: !!ext.has(def.path), count: pool.length, text: pool.length + ' 项', checked: false };
+    }
+    if (!ext.has(def.path)) return { found: false, text: '', checked: false };
     try {
       if (def.type === 'numberlong') {
         var v = ext.getValue(def.path);
@@ -111,12 +116,25 @@
   function typeBadge(def) {
     var map = {
       string: '字符串', int: '整数', float: '小数',
-      bool: '布尔', numberlong: 'NumberLong', json: 'JSON'
+      bool: '布尔', numberlong: 'NumberLong', json: 'JSON', cardpool: '卡片'
     };
     return map[def.type] || def.type;
   }
 
   function makeControl(def, state, compact) {
+    if (def.type === 'cardpool') {
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.className = 'prop-cardedit';
+      editBtn.textContent = '编辑（' + (state.count || 0) + '）';
+      editBtn.title = (def.desc || def.name) + '\n点击用卡片编辑：' + def.path;
+      editBtn.disabled = !isV3() || def.readonly;
+      editBtn.addEventListener('click', function () {
+        if (window.LvlCards && window.LvlCards.open) window.LvlCards.open(def);
+      });
+      return editBtn;
+    }
+
     if (def.type === 'bool') {
       var cb = document.createElement('input');
       cb.type = 'checkbox';
